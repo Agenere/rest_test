@@ -1,0 +1,134 @@
+<!DOCTYPE>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script>
+$(document).ready(function(){
+    // 삭제
+    $('#btn_remove').on('click',()=>{
+        var ck = [];//
+        $('.ck:checked').each(function(index,item){
+            ck.push($(item).val());
+        });
+       
+        $.ajax({
+            url:'/remove',
+            type:'GET',
+            data:{ck:ck},
+            success:function(row){
+                alert(row+'행 삭제');
+                $('#btn_list').trigger('click');
+            }
+        });
+        
+    });
+ 
+    // 추가
+    $('#btn_add').on('click',function(){
+        var boardPw = $('#boardPw').val();
+        var boardTitle = $('#boardTitle').val();
+        var boardContent = $('#boardContent').val();
+        var boardUser = $('#boardUser').val();
+        var boardDate = $('#boardDate').val();
+ 
+        $.ajax({//RPC 함수 호출 /비동기 호출
+            url:'/add',
+            type:'POST',
+            data:{boardPw:boardPw,boardTitle:boardTitle,boardContent:boardContent,boardUser:boardUser,boardDate:boardDate},
+            success:function(row){
+                alert(row+'행 추가');
+                $('#btn_list').trigger('click');//btn_list 버튼 이벤트(클릭) 해달라
+            }
+        });
+    });
+    // 수정
+    $('#btn_modify').on('click',function(){
+        var boardNo = $('#boardNo').val();
+        var boardPw = $('#boardPw').val();
+        var boardTitle = $('#boardTitle').val();
+        var boardContent = $('#boardContent').val();
+        var boardUser = $('#boardUser').val();
+        var boardDate = $('#boardDate').val();
+ 
+        $.ajax({
+            url:'/modifyById',
+            type:'POST',
+            data:{boardNo:boardNo,boardPw:boardPw,boardTitle:boardTitle,boardContent:boardContent,boardUser:boardUser,boardDate:boardDate},
+            success:function(row){
+                alert(row+'행 수정');
+                $('#btn_list').trigger('click');
+            }
+        });
+    });
+    // 목록
+    $('#btn_list').on('click',function(){
+        $.ajax({
+            url:'/list',
+            type:'GET',
+            success:(data)=>{
+            	console.log(data);
+                $('#list').empty();//삭제
+                $(data).each((index,item)=>{//foreach
+                    $('#list').append('<tr>');//append추가
+                    $('#list').append('<td><input type="checkbox" class="ck" value="'+item.boardNo+'"></td>');
+                    $('#list').append('<td>'+item.boardNo+'</td>');
+                    $('#list').append('<td>'+item.boardPw+'</td>');
+                    $('#list').append('<td>'+item.boardTitle+'</td>');
+                    $('#list').append('<td>'+item.boardContent+'</td>');
+                    $('#list').append('<td>'+item.boardUser+'</td>');
+                    $('#list').append('<td>'+item.boardDate+'</td>');
+                    $('#list').append('</tr>');
+                });
+            }
+        });
+    });
+});
+</script>
+</head>
+<body>
+	<table border="1">
+		<thead>
+			<tr>
+				<th>boardNo</th>
+				<th>boardPw</th>
+				<th>boardTitle</th>
+				<th>boardContent</th>
+				<th>boardUser</th>
+				<th>추가</th>
+				<th>수정</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><input type="text" id="boardNo"></td>
+				<td><input type="password" id="boardPw"></td>
+				<td><input type="text" id="boardTitle"></td>
+				<td><input type="text" id="boardContent"></td>
+				<td><input type="text" id="boardUser"></td>
+				<td><button id="btn_add">add</button></td>
+				<td><button id="btn_modify">modify</button></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<button id="btn_list">회원리스트</button>
+	<table border="1">
+		<thead>
+			<tr>
+				<th></th>
+				<th>boardNo</th>
+				<th>boardPw</th>
+				<th>boardTitle</th>
+				<th>boardContent</th>
+				<th>boardUser</th>
+				<th>boardDate</th>
+			</tr>
+		</thead>
+		<tbody id="list">
+
+		</tbody>
+	</table>
+	<button id="btn_remove">remove</button>
+</body>
+</html>
